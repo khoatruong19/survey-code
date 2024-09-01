@@ -47,6 +47,7 @@ export default function Home() {
       // setMessage("An error occurred");
     }
   };
+
   return (
     <main className="flex min-h-screen flex-col items-center gap-10 p-24">
       {file && (
