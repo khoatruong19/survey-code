@@ -1,9 +1,5 @@
 import { NextRequest } from "next/server";
 import puppeteer from "puppeteer";
-import chromium from "@sparticuz/chromium";
-
-chromium.setHeadlessMode = true;
-chromium.setGraphicsMode = false;
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,10 +7,7 @@ export async function POST(req: NextRequest) {
     const codes = body.code.split("-");
 
     const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: false,
     });
     const page = await browser.newPage();
     await page.goto("https://www.mcdvoice.com");

@@ -63,7 +63,7 @@ export default function Home() {
         onClick={handleSubmitForm}
         disabled={isLoading}
       >
-        {isLoading ? "Loading..." : "Sudbmit"}
+        {isLoading ? "Loading..." : "Submit"}
       </button>
     </main>
   );
