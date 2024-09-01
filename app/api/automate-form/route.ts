@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
       });
     const page = await browser.newPage();
     await page.goto("https://www.mcdvoice.com");
+    await page.setViewport({ width: 1080, height: 1024 });
 
     await page.type("#CN1", codes[0]);
     await page.type("#CN2", codes[1]);
