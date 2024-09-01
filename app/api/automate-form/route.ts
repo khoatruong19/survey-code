@@ -1,19 +1,18 @@
 import { NextRequest } from "next/server";
-import { initBrowser } from "./utils";
+import puppeteer from "puppeteer";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const codes = body.code.split("-");
 
-    const browser = await initBrowser();
+    const browser = await puppeteer.launch({ headless: false });
     if (!browser)
       return new Response(JSON.stringify({ error: "An error occurred" }), {
         status: 500,
       });
     const page = await browser.newPage();
     await page.goto("https://www.mcdvoice.com");
-    await page.setViewport({ width: 1080, height: 1024 });
 
     await page.type("#CN1", codes[0]);
     await page.type("#CN2", codes[1]);
