@@ -1,16 +1,21 @@
 import { NextRequest } from "next/server";
 import puppeteer from "puppeteer";
+import chromium from "@sparticuz/chromium";
 
-const clickRadioButton = async (page: any, name: string) => {};
+chromium.setHeadlessMode = true;
+chromium.setGraphicsMode = false;
 
-const sleep = (duration: number) =>
-  Promise.resolve(setTimeout(() => {}, duration));
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const codes = body.code.split("-");
 
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
     const page = await browser.newPage();
     await page.goto("https://www.mcdvoice.com");
 

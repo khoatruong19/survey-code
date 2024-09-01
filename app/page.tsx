@@ -6,6 +6,7 @@ import Tesseract from "tesseract.js";
 
 export default function Home() {
   const [file, setFile] = useState<any>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onFileChange = (e: any) => {
     setFile(e.target.files[0]);
@@ -26,10 +27,14 @@ export default function Home() {
 
   const handleSubmitForm = async () => {
     try {
+      setIsLoading(true);
       const code = await processImage();
       if (code === undefined) {
+        setIsLoading(false);
         return alert("Error recognizing code!");
       }
+      setIsLoading(false);
+      console.log({ code });
       await fetch("/api/automate-form", {
         method: "POST",
         headers: {
@@ -37,7 +42,6 @@ export default function Home() {
         },
         body: JSON.stringify({ code }),
       });
-      // setMessage(data.message || "Form submitted successfully");
     } catch (error) {
       console.log(error);
       // setMessage("An error occurred");
@@ -55,10 +59,11 @@ export default function Home() {
       )}
       <input type="file" onChange={onFileChange} />
       <button
-        className="border-2 px-3 py-2 rounded-md hover:bg-slate-500"
+        className="border-2 px-3 py-2 rounded-md"
         onClick={handleSubmitForm}
+        disabled={isLoading}
       >
-        Submit
+        {isLoading ? "Loading..." : "Sudbmit"}
       </button>
     </main>
   );
