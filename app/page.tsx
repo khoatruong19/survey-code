@@ -5,6 +5,7 @@ import { useState } from "react";
 import Tesseract from "tesseract.js";
 
 export default function Home() {
+  const [review, setReview] = useState("");
   const [file, setFile] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,11 +18,13 @@ export default function Home() {
       logger: (m) => {},
     })
       .then(({ data: { text } }) => {
-        const regex = /\b\d{5}-\d{5}-\d{5}-\d{5}-\d{5}-\d{1}\b/;
+        console.log({ text });
+        const regex = /\b\d{5}[- ]\d{5}[- ]\d{5}[- ]\d{5}[- ]\d{5}[- ]\d\b/;
         const match = text.match(regex) || [];
-        return match[0];
+        return match[0]?.replace(" ", "-").replace(".", "-");
       })
       .catch((e) => {
+        console.log({ e });
         return undefined;
       });
 
@@ -29,18 +32,18 @@ export default function Home() {
     try {
       setIsLoading(true);
       const code = await processImage();
-      if (code === undefined) {
+      console.log({ code });
+      if (code === undefined || !review) {
         setIsLoading(false);
         return alert("Error recognizing code!");
       }
       setIsLoading(false);
-      console.log({ code });
       await fetch("/api/automate-form", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code, review }),
       });
     } catch (error) {
       console.log(error);
@@ -59,6 +62,12 @@ export default function Home() {
         />
       )}
       <input type="file" onChange={onFileChange} />
+      <textarea
+        className="border-2 w-[400px] text-black font-semibold"
+        rows={10}
+        value={review}
+        onChange={(e) => setReview(e.target.value)}
+      />
       <button
         className="border-2 px-3 py-2 rounded-md"
         onClick={handleSubmitForm}

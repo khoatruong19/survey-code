@@ -5,6 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const codes = body.code.split("-");
+    const review = body.review ?? "";
 
     const browser = await puppeteer.launch({ headless: false });
     if (!browser)
@@ -105,6 +106,8 @@ export async function POST(req: NextRequest) {
       page.waitForNavigation({ waitUntil: "domcontentloaded" }),
       page.click("#NextButton"),
     ]);
+    // write review
+    await page.type("#S081000", review);
     await Promise.all([
       page.waitForNavigation({ waitUntil: "domcontentloaded" }),
       page.click("#NextButton"),
