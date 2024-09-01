@@ -9,9 +9,10 @@ export const initBrowser = async () => {
     const puppeteer = require("puppeteer-core");
     browser = await puppeteer.launch({
       args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      executablePath: await chromium.executablePath(
+        "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar"
+      ),
+      headless: true,
     });
   } else {
     const puppeteer = require("puppeteer");
