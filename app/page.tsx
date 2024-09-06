@@ -1,39 +1,37 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
-import Tesseract from "tesseract.js";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+
+const initialCode = {
+  1: "",
+  2: "",
+  3: "",
+  4: "",
+  5: "",
+  6: "",
+};
+
+const initCode = () => ({ ...initialCode });
 
 export default function Home() {
   const [review, setReview] = useState("");
-  const [file, setFile] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState(initCode());
 
-  const onFileChange = (e: any) => {
-    setFile(e.target.files[0]);
-  };
+  const firstCodeRef = useRef<HTMLInputElement | null>(null);
 
-  const processImage = async () =>
-    Tesseract.recognize(file, "eng", {
-      logger: (m) => {},
-    })
-      .then(({ data: { text } }) => {
-        console.log({ text });
-        const regex = /\b\d{5}[- ]\d{5}[- ]\d{5}[- ]\d{5}[- ]\d{5}[- ]\d\b/;
-        const match = text.match(regex) || [];
-        return match[0]?.replace(" ", "-").replace(".", "-");
-      })
-      .catch((e) => {
-        console.log({ e });
-        return undefined;
-      });
+  const handleOnChangeCode =
+    (field: keyof typeof code) => (e: ChangeEvent<HTMLInputElement>) => {
+      const newCode = { ...code };
+      newCode[field] = e.target.value;
+      setCode(newCode);
+    };
 
   const handleSubmitForm = async () => {
     try {
       setIsLoading(true);
-      const code = await processImage();
-      console.log({ code });
-      if (code === undefined || !review) {
+      const formatedCode = Object.values(code).join("-");
+      if (formatedCode.length != 31 || !review) {
         setIsLoading(false);
         return alert("Error recognizing code!");
       }
@@ -43,25 +41,33 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code, review }),
+        body: JSON.stringify({ code: formatedCode, review }),
       });
+      initCode();
     } catch (error) {
       console.log(error);
-      // setMessage("An error occurred");
     }
   };
 
+  useEffect(() => {
+    if (!firstCodeRef.current) return;
+    firstCodeRef.current.focus();
+  }, [firstCodeRef.current]);
+
   return (
     <main className="flex min-h-screen flex-col items-center gap-10 p-24">
-      {file && (
-        <Image
-          alt="image"
-          src={URL.createObjectURL(file) ?? ""}
-          width={300}
-          height={400}
+      <div className="flex flex-col gap-1">
+        <input
+          ref={firstCodeRef}
+          className="text-black"
+          onChange={handleOnChangeCode(1)}
         />
-      )}
-      <input type="file" onChange={onFileChange} />
+        <input className="text-black" onChange={handleOnChangeCode(2)} />
+        <input className="text-black" onChange={handleOnChangeCode(3)} />
+        <input className="text-black" onChange={handleOnChangeCode(4)} />
+        <input className="text-black" onChange={handleOnChangeCode(5)} />
+        <input className="text-black" onChange={handleOnChangeCode(6)} />
+      </div>
       <textarea
         className="border-2 w-[400px] text-black font-semibold"
         rows={10}
